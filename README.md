@@ -7,6 +7,7 @@ Northwind Dataset predstavuje vzorovú databázu, ktorá obsahuje údaje o preda
 ## Obsah
 
 - [Nastavenie základnej databázy](#nastavenia-zakladnej-databazy)
+- [ERD Diagram](#erd-diagram)
 - [Dimenzionálne a faktové tabuľky](#dimenzionalne-a-faktove-tabulky)
 - [Výkonnosť produktov](#vykonnost-produktov)
 - [Výkonnosť podľa regiónov](#vykonnost-podla-regionov)
@@ -22,49 +23,20 @@ Northwind Dataset predstavuje vzorovú databázu, ktorá obsahuje údaje o preda
 
 ERD (Entity-Relationship Diagram) znázorňuje hlavné entity, ich atribúty a vzťahy v databáze pre dataset Northwind. Nižšie nájdete podrobný popis kľúčových entít a ich vzťahov:
 
-### Orders (Objednávky):
-* Táto tabuľka obsahuje údaje o objednávkach, ako sú OrderDate (dátum objednávky), CustomerID (ID zákazníka), EmployeeID (ID zamestnanca) a ShipperID (ID prepravcu).
-* Je prepojená s tabuľkou Order Details na určenie produktov zahrnutých v jednotlivých objednávkach.
-
-### Order Details (Podrobnosti objednávok):
-* Táto tabuľka ukladá detaily o objednávkach, vrátane ProductID (ID produktu), OrderID (ID objednávky), Quantity (množstvo) a Price (cena).
-* Je prepojená s tabuľkami Orders a Products, čím spája informácie medzi konkrétnymi objednávkami a produktmi, ktoré obsahujú.
-
-### Products (Produkty):
-
-* Obsahuje údaje o produktoch, ako sú ProductName (názov produktu), SupplierID (ID dodávateľa), CategoryID (ID kategórie), Unit (jednotka) a Price (cena).
-* Je prepojená s tabuľkami Categories a Suppliers na podrobné zatriedenie produktov a informácie o ich dodávateľoch.
-
-### Customers (Zákazníci):
-
-* Táto tabuľka obsahuje údaje o zákazníkoch, vrátane CustomerName (meno zákazníka), ContactName (kontaktné meno), Address (adresa), City (mesto), Country (krajina) a ďalšie geografické detaily.
-* Je prepojená s tabuľkou Orders, aby identifikovala, ktorý zákazník vykonal konkrétnu objednávku.
-
-### Suppliers (Dodávatelia):
-
-* Obsahuje informácie o dodávateľoch, ako sú SupplierName (názov dodávateľa), ContactName (kontaktné meno), City (mesto), Country (krajina) a Phone (telefón).
-* Je prepojená s tabuľkou Products na určenie, ktorý dodávateľ poskytuje konkrétne produkty.
-
-### Categories (Kategórie):
-
-* Predstavuje kategórie produktov s atribútmi, ako sú CategoryName (názov kategórie) a Description (popis).
-* Je prepojená s tabuľkou Products, aby zatriedila produkty do relevantných kategórií.
-
-### Shippers (Prepravcovia):
-
-* Obsahuje údaje o prepravných spoločnostiach, ako sú ShipperName (názov prepravcu) a Phone (telefón).
- * Je prepojená s tabuľkou Orders, aby sa zaznamenalo, ktorá spoločnosť zabezpečuje doručenie konkrétnej objednávky.
-
-### Employees (Zamestnanci):
-
-* Obsahuje údaje o zamestnancoch, vrátane FirstName (krstné meno), LastName (priezvisko), BirthDate (dátum narodenia) a Notes (poznámky).
-* Je prepojená s tabuľkou Orders, aby sa identifikovalo, ktorý zamestnanec spracoval objednávku.
-
 ![Northwind_ERD](https://github.com/user-attachments/assets/ffd2d153-9a0e-498c-abd2-93b55f456b4b)
 
+---
+
 # Dimenzionálne a faktové tabuľky
-### DimDate
-Táto tabuľka obsahuje dátové dimenzie na základe dátumu objednávky, ktoré umožňujú analýzu predajov podľa dní, mesiacov, štvrťrokov, rokov a ďalších časových jednotiek.
+Dimenzionálny model bol vytvorený vo forme hviezdicového modelu (star schema), ktorý poskytuje vysokú efektivitu pri analýze obchodných dát. Hlavným prvkom modelu je faktová tabuľka fact_orders, ktorá je prepojená s týmito dimenziami:
+
+* ```dim_products```: Obsahuje detaily o produktoch, ako sú ich názvy, kategórie a ceny.
+* ```dim_customers```: Uchováva demografické informácie o zákazníkoch vrátane ich adries a krajín.
+* ```dim_employee```: Zaznamenáva údaje o zamestnancoch zodpovedných za spracovanie objednávok.
+* ```dim_suppliers```: Informácie o dodávateľoch a ich lokalitách.
+* ```dim_shippers```: Podrobnosti o prepravcoch, ktorí zabezpečujú doručenie objednávok.
+* ```dim_date```: Kalendárne informácie o objednávkach, ako sú dni, mesiace a roky.
+* ```dim_time```: Záznamy o časových údajoch, vrátane hodín a AM/PM.
 
 ![DIM](https://github.com/user-attachments/assets/6cfd58ea-4404-456c-80f5-8c5ac6e4b69c)
 
@@ -141,6 +113,33 @@ USE PEACOCK_NORTHWIND_DB;
 CREATE SCHEMA PEACOCK_NORTHWIND_DB.staging;
 USE SCHEMA PEACOCK_NORTHWIND_DB.staging;
 ```
+
+### Vyprázdnenie databázy
+
+Pred načítaním nových údajov je potrebné odstrániť existujúce staging tabuľky. Tento postup zabezpečí, že nové údaje nebudú kolidovať so starými.
+
+```sql
+DROP TABLE IF EXISTS categories_staging;
+DROP TABLE IF EXISTS customers_staging;
+DROP TABLE IF EXISTS employees_staging;
+DROP TABLE IF EXISTS shippers_staging;
+DROP TABLE IF EXISTS suppliers_staging;
+DROP TABLE IF EXISTS products_staging;
+DROP TABLE IF EXISTS orders_staging;
+DROP TABLE IF EXISTS orderdetails_staging;
+```
+
+### Načítanie údajov pomocou COPY INTO
+
+Dáta boli do staging tabuliek načítané z CSV súborov uložených v cloudovom úložisku pomocou nasledujúceho príkazu:
+
+```sql
+COPY INTO Categories
+FROM @PEACOCK_NORTHWIND_DB_stage/northwind_table_categories.csv
+FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
+```
+
+Tento príkaz zabezpečí korektné načítanie údajov z CSV do tabuľky Categories. Rovnako boli načítané aj ostatné tabuľky.
 
 ---
 
