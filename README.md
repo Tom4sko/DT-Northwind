@@ -19,90 +19,6 @@ Northwind Dataset predstavuje vzorovú databázu, ktorá obsahuje údaje o preda
 
 ---
 
-# ERD Diagram
-
-ERD (Entity-Relationship Diagram) znázorňuje hlavné entity, ich atribúty a vzťahy v databáze pre dataset Northwind. Nižšie nájdete podrobný popis kľúčových entít a ich vzťahov:
-
-![Northwind_ERD](https://github.com/user-attachments/assets/ffd2d153-9a0e-498c-abd2-93b55f456b4b)
-
----
-
-# Dimenzionálne a faktové tabuľky
-Dimenzionálny model bol vytvorený vo forme hviezdicového modelu (star schema), ktorý poskytuje vysokú efektivitu pri analýze obchodných dát. Hlavným prvkom modelu je faktová tabuľka fact_orders, ktorá je prepojená s týmito dimenziami:
-
-* ```dim_products```: Obsahuje detaily o produktoch, ako sú ich názvy, kategórie a ceny.
-* ```dim_customers```: Uchováva demografické informácie o zákazníkoch vrátane ich adries a krajín.
-* ```dim_employee```: Zaznamenáva údaje o zamestnancoch zodpovedných za spracovanie objednávok.
-* ```dim_suppliers```: Informácie o dodávateľoch a ich lokalitách.
-* ```dim_shippers```: Podrobnosti o prepravcoch, ktorí zabezpečujú doručenie objednávok.
-* ```dim_date```: Kalendárne informácie o objednávkach, ako sú dni, mesiace a roky.
-* ```dim_time```: Záznamy o časových údajoch, vrátane hodín a AM/PM.
-
-![DIM](https://github.com/user-attachments/assets/6cfd58ea-4404-456c-80f5-8c5ac6e4b69c)
-
-```sql
-CREATE OR REPLACE TABLE DimDate AS
-SELECT 
-    DISTINCT 
-    DATE_TRUNC('day', o.OrderDate) AS Date,
-    DATE_TRUNC('month', o.OrderDate) AS Month,
-    DATE_TRUNC('year', o.OrderDate) AS Year,
-    EXTRACT(month FROM o.OrderDate) AS MonthNumber,
-    EXTRACT(quarter FROM o.OrderDate) AS Quarter,
-    EXTRACT(week FROM o.OrderDate) AS WeekNumber,
-    EXTRACT(day FROM o.OrderDate) AS DayNumber
-FROM Orders o;
-```
-
-### DimProduct
-Obsahuje informácie o produktoch, kategóriách a dodávateľoch.
-
-```sql
-CREATE OR REPLACE TABLE DimProduct AS
-SELECT DISTINCT 
-    p.ProductID,
-    p.ProductName,
-    p.CategoryID,
-    c.CategoryName,
-    p.SupplierID,
-    s.SupplierName
-FROM Products p
-JOIN Categories c ON p.CategoryID = c.CategoryID
-JOIN Suppliers s ON p.SupplierID = s.SupplierID;
-```
-
-### DimCustomer
-Tabuľka pre údaje o zákazníkoch, ich polohe a ďalších atribútoch.
-
-```sql
-CREATE OR REPLACE TABLE DimCustomer AS
-SELECT DISTINCT 
-    c.CustomerID,
-    c.CustomerName,
-    c.Country,
-    c.City,
-    c.PostalCode
-FROM Customers c;
-```
-
-### FactSales
-```sql
-CREATE OR REPLACE TABLE FactSales AS
-SELECT 
-    o.OrderID,
-    DATE_TRUNC('day', o.OrderDate) AS Date,
-    od.ProductID,
-    p.CategoryID,
-    p.SupplierID,
-    c.CustomerID,
-    od.Quantity,
-    (od.Quantity * p.Price) AS TotalSales
-FROM Orders o
-JOIN OrderDetails od ON o.OrderID = od.OrderID
-JOIN Products p ON od.ProductID = p.ProductID
-JOIN Customers c ON o.CustomerID = c.CustomerID;
-```
-
 # Nastavenie základnej databázy
 
 Pre účely tejto analýzy bola vytvorená databáza s názvom PEACOCK_NORTHWIND_DB so štruktúrou schémy a tabuliek pre staging a analytické dáta.
@@ -140,6 +56,167 @@ FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
 ```
 
 Tento príkaz zabezpečí korektné načítanie údajov z CSV do tabuľky Categories. Rovnako boli načítané aj ostatné tabuľky.
+
+---
+
+# ERD Diagram
+
+ERD (Entity-Relationship Diagram) znázorňuje hlavné entity, ich atribúty a vzťahy v databáze pre dataset Northwind. Nižšie nájdete podrobný popis kľúčových entít a ich vzťahov:
+
+![Northwind_ERD](https://github.com/user-attachments/assets/ffd2d153-9a0e-498c-abd2-93b55f456b4b)
+
+---
+
+# Dimenzionálne a faktové tabuľky
+Dimenzionálny model bol vytvorený vo forme hviezdicového modelu (star schema), ktorý poskytuje vysokú efektivitu pri analýze obchodných dát. Hlavným prvkom modelu je faktová tabuľka fact_orders, ktorá je prepojená s týmito dimenziami:
+
+* ```dim_products```: Obsahuje detaily o produktoch, ako sú ich názvy, kategórie a ceny.
+* ```dim_customers```: Uchováva demografické informácie o zákazníkoch vrátane ich adries a krajín.
+* ```dim_employee```: Zaznamenáva údaje o zamestnancoch zodpovedných za spracovanie objednávok.
+* ```dim_suppliers```: Informácie o dodávateľoch a ich lokalitách.
+* ```dim_shippers```: Podrobnosti o prepravcoch, ktorí zabezpečujú doručenie objednávok.
+* ```dim_date```: Kalendárne informácie o objednávkach, ako sú dni, mesiace a roky.
+* ```dim_time```: Záznamy o časových údajoch, vrátane hodín a AM/PM.
+
+![DIM](https://github.com/user-attachments/assets/6cfd58ea-4404-456c-80f5-8c5ac6e4b69c)
+
+### dim_date
+
+* Táto dimenzia slúži na ukladanie dátumových informácií, ako sú rok, mesiac, deň a typ dňa (víkend vs. pracovný deň). Vytvára sa pomocou dátumu objednávky (```orderdate```) z tabuľky ```orders_staging```.
+
+```sql
+CREATE OR REPLACE TABLE dim_date AS
+SELECT DISTINCT
+    ROW_NUMBER() OVER (ORDER BY DATE_TRUNC('DAY', orderdate)) AS dim_dateid,
+    DATE_TRUNC('DAY', orderdate) AS date,
+    EXTRACT(YEAR FROM orderdate) AS year,
+    EXTRACT(MONTH FROM orderdate) AS month,
+    EXTRACT(DAY FROM orderdate) AS day,
+    CASE
+        WHEN EXTRACT(DAYOFWEEK FROM orderdate) IN (6, 7) THEN 'Weekend'
+        ELSE 'Weekday'
+    END AS day_type
+FROM orders_staging;
+```
+
+### dim_suppliers
+
+* Táto dimenzia obsahuje údaje o dodávateľoch, ako sú názov dodávateľa, kontaktná osoba, mesto, krajina a telefónne číslo. Dátové zdroje pochádzajú z tabuľky ```suppliers_staging```.
+
+```sql
+CREATE OR REPLACE TABLE dim_suppliers AS
+SELECT DISTINCT
+    supplierid AS dim_supplierid,
+    suppliername AS supplier_name,
+    contactname AS contact_name,
+    city AS city,
+    country AS country,
+    phone AS phone
+FROM suppliers_staging;
+```
+
+### dim_products
+
+* Obsahuje informácie o produktoch vrátane názvu, kategórie, jednotiek (balenie, hmotnosť) a ceny. Dáta pochádzajú z tabuľky ```products_staging```.
+
+```sql
+CREATE OR REPLACE TABLE dim_products AS
+SELECT DISTINCT
+    productid AS dim_productid,
+    productname AS product_name,
+    categoryid AS category_id,
+    unit AS unit,
+    price AS price
+FROM products_staging;
+```
+
+### dim_customers
+
+* Táto tabuľka je dimenziou zákazníkov. Obsahuje údaje o zákazníkoch, ako sú názov, kontaktná osoba, lokalita (mesto, krajina) a poštové smerovacie číslo. Zdrojom sú dáta z ```customers_staging```.
+
+```sql
+CREATE OR REPLACE TABLE dim_customers AS
+SELECT DISTINCT
+    customerid AS dim_customerid,
+    customername AS customer_name,
+    contactname AS contact_name,
+    city AS city,
+    country AS country,
+    postalcode AS postal_code
+FROM customers_staging;
+```
+
+### dim_employees
+
+* Táto dimenzia obsahuje údaje o zamestnancoch, ako sú meno, priezvisko, dátum narodenia, fotografia a poznámky. Tieto údaje pochádzajú z tabuľky ```employees_staging```.
+
+```sql
+CREATE OR REPLACE TABLE dim_employees AS
+SELECT DISTINCT
+    employeeid AS dim_employeeid,
+    firstname AS first_name,
+    lastname AS last_name,
+    birthdate AS birth_date,
+    photo AS photo,
+    notes AS notes
+FROM employees_staging;
+```
+
+### dim_shippers
+
+* Obsahuje informácie o prepravcoch, ako sú názov prepravcu a telefónne číslo. Dáta pochádzajú z tabuľky ```shippers_staging```.
+
+```sql
+CREATE OR REPLACE TABLE dim_shippers AS
+SELECT DISTINCT
+    shipperid AS dim_shipperid,
+    shippername AS shipper_name,
+    phone AS phone
+FROM shippers_staging;
+```
+
+### dim_categories
+
+* Táto dimenzia ukladá kategórie produktov, obsahuje názov kategórie a jej popis. Dáta sú získané z tabuľky ```categories_staging```.
+
+```sql
+CREATE OR REPLACE TABLE dim_categories AS
+SELECT DISTINCT
+    categoryid AS dim_categoryid,
+    categoryname AS category_name,
+    description AS description
+FROM categories_staging;
+```
+
+### fact_orders
+
+* Faktová tabuľka objednávok uchováva transakčné údaje, ako sú ID objednávky, dátum objednávky, zákazník, zamestnanec, dodávateľ, produkt, kategória, množstvo, jednotková cena a celková cena. Táto tabuľka je kľúčová pre analýzu a vzniká spojením dimenzií (napr. ```dim_date```, ```dim_customers```) s faktickými dátami z ```orders``` a ```orderdetails_staging```.
+* Táto štruktúra podporuje efektívnu analýzu predaja, dodávateľov a kategórií produktov.
+
+```sql
+CREATE OR REPLACE TABLE fact_orders AS
+SELECT
+    o.orderid AS fact_orderid,
+    o.orderdate AS order_date,
+    d.dim_dateid AS date_id,
+    c.dim_customerid AS customer_id,
+    e.dim_employeeid AS employee_id,
+    s.dim_supplierid AS supplier_id,
+    sh.dim_shipperid AS shipper_id,
+    p.dim_productid AS product_id,
+    p.category_id AS dim_categoryid,
+    od.quantity AS quantity,
+    p.price AS unit_price,
+    od.quantity * p.price AS total_price
+FROM orders o
+JOIN orderdetails_staging od ON o.orderid = od.orderid
+JOIN dim_date d ON DATE_TRUNC('DAY', o.orderdate) = d.date
+JOIN dim_customers c ON o.customerid = c.dim_customerid
+JOIN dim_products p ON od.productid = p.dim_productid
+JOIN dim_suppliers s ON p.category_id = s.dim_supplierid
+JOIN dim_employees e ON o.employeeid = e.dim_employeeid
+JOIN dim_shippers sh ON o.shipperid = sh.dim_shipperid;
+```
 
 ---
 
