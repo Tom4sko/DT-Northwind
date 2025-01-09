@@ -67,12 +67,14 @@ ERD (Entity-Relationship Diagram) znázorňuje hlavné entity, ich atribúty a v
 Dimenzionálny model bol vytvorený vo forme hviezdicového modelu (star schema), ktorý poskytuje vysokú efektivitu pri analýze obchodných dát. Hlavným prvkom modelu je faktová tabuľka fact_orders, ktorá je prepojená s týmito dimenziami:
 
 * ```dim_products```: Obsahuje detaily o produktoch, ako sú ich názvy, kategórie a ceny.
+* ```dim_categories```: Obsahuje názvy kategórii.
 * ```dim_customers```: Uchováva demografické informácie o zákazníkoch vrátane ich adries a krajín.
-* ```dim_employee```: Zaznamenáva údaje o zamestnancoch zodpovedných za spracovanie objednávok.
+* ```dim_employees```: Zaznamenáva údaje o zamestnancoch zodpovedných za spracovanie objednávok.
 * ```dim_suppliers```: Informácie o dodávateľoch a ich lokalitách.
 * ```dim_shippers```: Podrobnosti o prepravcoch, ktorí zabezpečujú doručenie objednávok.
 * ```dim_date```: Kalendárne informácie o objednávkach, ako sú dni, mesiace a roky.
-* ```dim_time```: Záznamy o časových údajoch, vrátane hodín a AM/PM.
+* ```fact_orders```: Slúži ako hlavná tabuľka faktov v dátovom sklade, ktorá zhromažďuje a uchováva všetky údaje týkajúce sa objednávok.
+
 
 ![DIM](https://github.com/user-attachments/assets/6cfd58ea-4404-456c-80f5-8c5ac6e4b69c)
 
