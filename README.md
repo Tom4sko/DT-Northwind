@@ -6,15 +6,15 @@ Northwind Dataset predstavuje vzorovú databázu, ktorá obsahuje údaje o preda
 
 ## Obsah
 
-- [Nastavenie základnej databázy](#nastavenia-zakladnej-databazy)
+- [Nastavenie základnej databázy](#nastavenie-základnej-databázy)
 - [ERD Diagram](#erd-diagram)
-- [Dimenzionálne a faktové tabuľky](#dimenzionalne-a-faktove-tabulky)
-- [Výkonnosť produktov](#vykonnost-produktov)
-- [Výkonnosť podľa regiónov](#vykonnost-podla-regionov)
-- [Analýza dodávateľov](#analyza-dodavatelov)
-- [Trendy predaja v čase](#trendy-predaja-v-case)
-- [Analýza objednávok](#analyza-objednavok)
-- [Záver](#zaver)
+- [Dimenzionálne a faktové tabuľky](#dimenzionálne-a-faktové-tabuľky)
+- [Výkonnosť produktov](###výkonnosť-produktov)
+- [Výkonnosť podľa regiónov](###výkonnost-podľa-regiónov)
+- [Analýza dodávateľov](###analýza-dodávateľov)
+- [Trendy predaja v čase](###trendy-predaja-v-čase)
+- [Analýza objednávok](###analýza-objednávok)
+- [Záver](#záver)
 
 
 ---
