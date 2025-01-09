@@ -81,6 +81,7 @@ Dimenzionálny model bol vytvorený vo forme hviezdicového modelu (star schema)
 ### dim_date
 
 * Táto dimenzia slúži na ukladanie dátumových informácií, ako sú rok, mesiac, deň a typ dňa (víkend vs. pracovný deň). Vytvára sa pomocou dátumu objednávky (```orderdate```) z tabuľky ```orders_staging```.
+* Typ: ```SCD Type 0```.
 
 ```sql
 CREATE OR REPLACE TABLE dim_date AS
@@ -100,6 +101,7 @@ FROM orders_staging;
 ### dim_suppliers
 
 * Táto dimenzia obsahuje údaje o dodávateľoch, ako sú názov dodávateľa, kontaktná osoba, mesto, krajina a telefónne číslo. Dátové zdroje pochádzajú z tabuľky ```suppliers_staging```.
+* Typ: ```SCD Type 1```.
 
 ```sql
 CREATE OR REPLACE TABLE dim_suppliers AS
@@ -116,6 +118,7 @@ FROM suppliers_staging;
 ### dim_products
 
 * Obsahuje informácie o produktoch vrátane názvu, kategórie, jednotiek (balenie, hmotnosť) a ceny. Dáta pochádzajú z tabuľky ```products_staging```.
+* Typ: ```SCD Type 1```.
 
 ```sql
 CREATE OR REPLACE TABLE dim_products AS
@@ -131,6 +134,7 @@ FROM products_staging;
 ### dim_customers
 
 * Táto tabuľka je dimenziou zákazníkov. Obsahuje údaje o zákazníkoch, ako sú názov, kontaktná osoba, lokalita (mesto, krajina) a poštové smerovacie číslo. Zdrojom sú dáta z ```customers_staging```.
+* Typ: ```SCD Type 1```.
 
 ```sql
 CREATE OR REPLACE TABLE dim_customers AS
@@ -147,6 +151,7 @@ FROM customers_staging;
 ### dim_employees
 
 * Táto dimenzia obsahuje údaje o zamestnancoch, ako sú meno, priezvisko, dátum narodenia, fotografia a poznámky. Tieto údaje pochádzajú z tabuľky ```employees_staging```.
+* Typ: ```SCD Type 1```.
 
 ```sql
 CREATE OR REPLACE TABLE dim_employees AS
@@ -163,6 +168,7 @@ FROM employees_staging;
 ### dim_shippers
 
 * Obsahuje informácie o prepravcoch, ako sú názov prepravcu a telefónne číslo. Dáta pochádzajú z tabuľky ```shippers_staging```.
+* Typ: ```SCD Type 1```.
 
 ```sql
 CREATE OR REPLACE TABLE dim_shippers AS
@@ -176,6 +182,7 @@ FROM shippers_staging;
 ### dim_categories
 
 * Táto dimenzia ukladá kategórie produktov, obsahuje názov kategórie a jej popis. Dáta sú získané z tabuľky ```categories_staging```.
+* Typ: ```SCD Type 1```.
 
 ```sql
 CREATE OR REPLACE TABLE dim_categories AS
@@ -190,6 +197,7 @@ FROM categories_staging;
 
 * Faktová tabuľka objednávok uchováva transakčné údaje, ako sú ID objednávky, dátum objednávky, zákazník, zamestnanec, dodávateľ, produkt, kategória, množstvo, jednotková cena a celková cena. Táto tabuľka je kľúčová pre analýzu a vzniká spojením dimenzií (napr. ```dim_date```, ```dim_customers```) s faktickými dátami z ```orders``` a ```orderdetails_staging```.
 * Táto štruktúra podporuje efektívnu analýzu predaja, dodávateľov a kategórií produktov.
+* Typ: Nepoužíva sa typ SCD.
 
 ```sql
 CREATE OR REPLACE TABLE fact_orders AS
