@@ -9,7 +9,7 @@ Northwind Dataset predstavuje vzorovú databázu, ktorá obsahuje údaje o preda
 - [Nastavenie základnej databázy](#nastavenie-základnej-databázy)
 - [ERD Diagram](#erd-diagram)
 - [Dimenzionálne a faktové tabuľky](#dimenzionálne-a-faktové-tabuľky)
-- [Výkonnosť produktov](###výkonnosť-produktov)
+- [Výkonnosť produktov](#výkonnosť-produktov)
 - [Výkonnosť podľa regiónov](###výkonnost-podľa-regiónov)
 - [Analýza dodávateľov](###analýza-dodávateľov)
 - [Trendy predaja v čase](###trendy-predaja-v-čase)
