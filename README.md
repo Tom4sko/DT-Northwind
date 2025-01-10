@@ -61,6 +61,10 @@ ERD (Entity-Relationship Diagram) znázorňuje hlavné entity, ich atribúty a v
 
 ![Northwind_ERD](https://github.com/user-attachments/assets/ffd2d153-9a0e-498c-abd2-93b55f456b4b)
 
+*Entity-Relationship Diagram (ERD) pre databázu Northwind.*
+
+Týmto spôsobom popis nebude rušivý, ale stále poskytne potrebné informácie. Ak by ste chceli 
+
 ---
 
 # Dimenzionálne a faktové tabuľky
@@ -77,6 +81,8 @@ Dimenzionálny model bol vytvorený vo forme hviezdicového modelu (star schema)
 
 
 ![DIM](https://github.com/user-attachments/assets/6cfd58ea-4404-456c-80f5-8c5ac6e4b69c)
+
+*Schéma dimenzionálneho modelu (hviezdicového modelu) pre databázu Northwind.*
 
 ### dim_date
 
@@ -236,6 +242,9 @@ Analyzovali sme najpredávanejšie produkty a produkty s nižším predajom, aby
 * Produkty s nižším predajom môžu byť predmetom ďalšej analýzy, kde navrhneme opatrenia na zlepšenie predaja, napríklad zlepšením ich viditeľnosti alebo úpravou cenovej politiky.
   
 ![vykonostproduktov1](https://github.com/user-attachments/assets/1c53b3ba-b010-492d-a16d-32090d685445)
+
+*Graf najpredávanejších priduktov*
+
 ```sql
 SELECT 
     p.ProductName,
@@ -249,6 +258,9 @@ LIMIT 10;
 ```
 
 ![vykonostproduktov2](https://github.com/user-attachments/assets/399993cd-5b12-4f7a-9832-d5d22ee11ee0)
+
+*Graf najmenej priduktov*
+
 ```sql
 SELECT 
     p.ProductName,
@@ -268,6 +280,9 @@ Analyzovaním predaja podľa geografických oblastí sme získali prehľad o reg
 * Identifikáciou týchto regionálnych rozdielov môžeme prispôsobiť ponuku a marketingové kampane pre rôzne trhy, čo vedie k efektívnejšiemu prístupu k zákazníkom.
 
 ![vykonostregionov](https://github.com/user-attachments/assets/a8d01afd-e2e0-4ccd-9634-2ce9375da516)
+
+*Graf výkonnosť podľa regiónov*
+
 ```sql
 SELECT 
     c.Country,
@@ -288,6 +303,9 @@ Analyzáciou výkonnosti dodávateľov sme mohli porovnať, ktorý dodávateľ z
 Tieto analýzy poskytujú hlboký pohľad na výkonnosť predaja, produktov, regionálnych trhov a dodávateľských vzťahov, čo vedie k lepšiemu riadeniu podnikových procesov a zvyšovaniu efektivity a ziskovosti.
 
 ![analyzadodavatelov1](https://github.com/user-attachments/assets/5a6a03e2-88ff-43f4-89dc-8a7b13eae995)
+
+*Graf najlepších dodávateľov*
+
 ```sql
 SELECT 
     s.SupplierName,
@@ -301,6 +319,9 @@ LIMIT 5;
 ```
 
 ![analyzadodavatelov2](https://github.com/user-attachments/assets/da9ac645-9c26-4c0e-8fac-2cec72441d69)
+
+*Graf najhorších dodávateľov*
+
 ```sql
 SELECT 
     s.SupplierName,
@@ -321,6 +342,9 @@ Analyzovaním predaja na rôznych úrovniach, ako mesačne, štvrťročne alebo 
 * Výsledky nám umožňujú lepšie pochopiť, ktoré mesiace či obdobia sú najvýznamnejšie z hľadiska predaja, a vďaka tomu optimalizovať marketingové aktivity a zásoby.
 
 ![trendy1](https://github.com/user-attachments/assets/59780760-4f32-4e6c-93d6-618767cdbadd)
+
+*Graf trendov za mesiac*
+
 ```sql
 SELECT 
     d.Month,
@@ -333,6 +357,9 @@ LIMIT 10;
 ```
 
 ![trendy2](https://github.com/user-attachments/assets/7c767772-379b-48b0-9ec1-03ba66a506a0)
+
+*Graf trendov za rok*
+
 ```sql
 SELECT 
     d.Month,
@@ -351,6 +378,9 @@ Analyzovali sme priemernú hodnotu objednávok a sledovali trend v počte objedn
 * Trend počtu objednávok poskytuje informácie o sezónnych výkyvoch a potenciálnych skokoch v dopyte, čo umožňuje lepšie plánovanie kapacít a zdrojov.
 
 ![analyzaobjednavok1](https://github.com/user-attachments/assets/fe38eed9-931d-4eeb-a67f-377532a67985)
+
+*Graf priemernej hodnoty objednávok*
+
 ```sql
 SELECT 
     f.OrderID,
@@ -369,6 +399,9 @@ FROM (
 ```
 
 ![analyzaobjednavok2](https://github.com/user-attachments/assets/9ec67207-6e40-4a95-9772-f953d1d82c4d)
+
+*Graf trendov v počte objednávok*
+
 ```sql
 SELECT 
     d.Month,
