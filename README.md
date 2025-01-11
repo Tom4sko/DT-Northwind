@@ -63,8 +63,6 @@ ERD (Entity-Relationship Diagram) znázorňuje hlavné entity, ich atribúty a v
 
 *Entity-Relationship Diagram (ERD) pre databázu Northwind.*
 
-Týmto spôsobom popis nebude rušivý, ale stále poskytne potrebné informácie. Ak by ste chceli 
-
 ---
 
 # Dimenzionálne a faktové tabuľky
