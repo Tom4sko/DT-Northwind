@@ -243,7 +243,7 @@ Analyzovali sme najpredávanejšie produkty a produkty s nižším predajom, aby
   
 ![vykonostproduktov1](https://github.com/user-attachments/assets/1c53b3ba-b010-492d-a16d-32090d685445)
 
-*Graf najpredávanejších priduktov*
+*Graf najpredávanejších produktov*
 
 ```sql
 SELECT 
@@ -259,7 +259,7 @@ LIMIT 10;
 
 ![vykonostproduktov2](https://github.com/user-attachments/assets/399993cd-5b12-4f7a-9832-d5d22ee11ee0)
 
-*Graf najmenej priduktov*
+*Graf najmenej predávané produkty*
 
 ```sql
 SELECT 
